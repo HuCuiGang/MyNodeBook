@@ -103,7 +103,7 @@ select ’123‘+90；其中一个为字符型，试图将字符型转换成数�
 
 select ’john‘+90；如果转换失败，则将字符型数值转换成0
 
-#### 10.拼接
+#### 10.拼接,concat函数
 `select concat（'a','b','c'） AS 结果；`
 
 `select concat (last_name,first_name) AS 姓名 from employees；`
@@ -195,3 +195,89 @@ select last_name from employees where last_name like '_$_%' escape '$';
 `select * from employees where emloyee_id>=100 and employees_id<=120;`
 
 `select * from employees where emloyee_id between 100 and 120;`
+
+### 3.in
+含义：判断某个字段的值是否属于in列表中的某一项
+
+特点：	
+
+	1.使用in提高语句简洁度
+	2.in列表的值类型必须一致或兼容
+	3.不支持通配符
+
+案例：查询员工的工种编号是 IT_PROG、AD_VP、AD_PRES中的一个员工名和工种编号
+
+`select last_name,job_id from employees where job_id = 'IT_PROT' OR job_id = 'AD_VP' OR job_id = 'AD_PRES';`
+
+--------------------------------
+`select last_name,job_id from employees where job_id IN('IT_PROT','AD_VP','AD_PRES') ;`
+
+### 4.is null
+
+案例1：查询没有奖金的员工名和奖金率
+
+`select last_name,commission_pct from employees where commission_pct IS NULL;`
+
+安全等于 <=> （判断是否等于）
+
+``select last_name,commission_pct from employees where commission_pct <=> NULL;``
+
+案例2：查询有奖金的员工名和奖金率
+
+`select last_name,commission_pct from employees where commission_pct IS NOT NULL;`
+
+案例3：查询工资为12000的员工名
+
+`select last_name from employees where salary <=> 12000;`
+
+-------------------------------------------
+查询员工号为176的员工的姓名和部门号和年新
+
+`select last_name,department_id,salary*12*(1+ifnull(commission_pct,0)) AS 年薪 from employees;`
+
+## 进阶3:排序查询
+引入：
+
+	select * from employees;
+
+语法： 
+
+	select 查询列表 from 表 where 帅选条件 order by 排序列表 asc|desc
+
+特点：
+
+	1.asc代表的是升序，desc代表的是降序。
+	如果不写，默认是升序。
+	2.order by子句中可以支持单个字段、多个字段、表达式、函数、别名
+	3.order by子句一般是放在语句的最后面，limit子句除外
+
+案例1：查询员工信息，要求工资从高到低排序
+
+`select * from employees order by salary desc;`
+
+升序：
+
+`select * from employees order by salary asc;`
+
+`select * from employees order by salary;`
+
+
+案例2：查询部门编号>=90的员工信息，安入职时间的先后顺序排序（添加帅选条件）
+
+`select * from employees where department_id>=90 order by hiredate ASC;`
+
+案例3：安年新的高低显示员工的信息和年薪（按表达式和别名排序）
+
+`select *,salary*12*(1+ifnull(commission_pct,0)) 年薪 from order by salary*12*(1+ifnull(commission_pct,0)) desc;`
+
+`select *,salary*12*(1+ifnull(commission_pct,0)) 年薪 from order by 年薪 desc;`
+
+案例4：按姓名的长度显示员工的姓名和工资（按函数排序）
+
+`select length（last_name） 字节长度，last_name,salary from employees order by length(last_name) desc;`
+
+案例6： 查询员工信息，要求先按工资升序，再按员工编号降序（安多个字段排序）
+
+`select * from employees order by salary asc,employees_id desc;`
+
+
