@@ -81,11 +81,11 @@ dos命令：mysql -v
 select 100%98 AS 结果;
 
 select last_name AS 姓，first_name AS 名 from employees;
----
+
 方式二：使用空格
 
 select last_name 姓，first_name 名 from employees；
----
+
 案例：查询salary，显示结果为 out put
 
 `select salary AS “out put” from employees;`
@@ -155,7 +155,7 @@ select ’john‘+90；如果转换失败，则将字符型数值转换成0
 
 `select * from employees where not(department_id>90 and department_id<=110) or salary>15000;`
 
-## 三、模糊查询
+## 八、模糊查询
 like
 特点：
 
@@ -235,7 +235,7 @@ select last_name from employees where last_name like '_$_%' escape '$';
 
 `select last_name,department_id,salary*12*(1+ifnull(commission_pct,0)) AS 年薪 from employees;`
 
-## 进阶3:排序查询
+## 九、进阶3:排序查询
 引入：
 
 	select * from employees;
@@ -280,4 +280,99 @@ select last_name from employees where last_name like '_$_%' escape '$';
 
 `select * from employees order by salary asc,employees_id desc;`
 
+## 十、分组查询
+语法：
+
+	select 分组函数，列（要求出现在group by的后面）
+	from 表
+	where 筛选条件
+	group by 分组的列表
+	order by 子句
+
+注意：
+
+	查询列表必须特殊没要求是分组函数和group by后出现的字段
+
+特点：
+
+	1.分组查询中的筛选条件分为两类
+		       数据源
+	分组前筛选	 原始表
+	分组后筛选	 分组后的结果集
+
+	分组函数做条件肯定是放在having子句中
+	能用分组前帅选的，就优先考虑使用分组前筛选
+
+	2.group by子句支持单个字段分组，多个字段分组（多个字段之间用逗号隔开没有顺序要求），表达式
+
+	3.也可以添加排序(排序放到整个分组查询的最后)
+
+案例1：查询每个工种的最高工资
+
+`select max（salary），job_id from employees group by job_id;` 
+
+案例2：查询每个位置上的部门个数
+
+`select count（*),location_id from department group by location_id;`
+
+添加筛选条件
+
+案例1：查询邮箱中包含a字符的，每个部门的平均工资
+
+`select avg（salary），department_id from employees where email like ’%a%‘ group by department_id`
+
+案例2：查询有奖金的每个领导手下员工的最高工资
+
+`select max（salary），manager_id from employees where commission_pct is not null group by manager_id;`
+
+添加复杂的筛选条件
+
+案例1：查询哪个部门的员工个数>2
+
+	1.查询每个部门的员工给个数
+	select count(*),department_id from employees group by department_id;
+	2.根据1.的结果进行帅选，查询哪个部门的员工个数>2
+	select count(*),department_id from employees group by department_id having count(*)>2;
+
+案例2：查询每个工中有奖金的员工的最高工资>12000的工种编号和最高工资
+
+`select max（salary），job_id from employees where commission_pct is not null group by job_id having max(salary)>12000;`
+
+案例3：擦呼吸呢领导编号>102的每个领导手下的对低工资>5000的领导编号是哪个，以及其最低工资
+
+	1.查询每个领导手下的员工固定最低工资
+	select min（salary），manager from employees group by manager_id
+	2.添加筛选条件 manager>102
+	select min（salary），manager from where manager_id>102 employees group by manager_id 
+	3.添加筛选条件 最低工资>5000
+	select min（salary），manager from where manager_id>102 employees group by manager_id having min(salary)>5000;
+
+### 按表达式或函数分组
+案例：按员工姓名的长度分组，查询每一组的员工个数，筛选员工个数>5的有哪些
+
+	1.查询每个长度的员工个数
+	select count(*),length(last_name) len_name
+	from employees
+	group by length(last_name);
+	2.添加筛选条件 
+	elect count(*),length(last_name) len_name
+	from employees
+	group by length(last_name)
+	having count(*)>5;
+
+### 按多个字段分组
+案例：查询每个部门每个工种的员工的平均工资
+
+`select avg(salary),department_id,job_id from employees group by job_id,department_id;`
+
+### 添加排序
+案例：查询每个部门每个工种的员工的平均工资，并按平均工资的高低显示
+```
+select avg（salary） a，department_id,job_id 
+from employees 
+where department_id is not null
+group by job_id,department_id
+having avg(salary)>10000
+order by a  desc;
+```
 

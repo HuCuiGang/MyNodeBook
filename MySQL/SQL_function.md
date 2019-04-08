@@ -18,6 +18,7 @@
     2.分组函数
 
     功能：做统计使用，又称统计函数、聚合函数、组函数
+    
 
 ##二.字符函数
 `length（）；` 获取参数值的字节数（根据字符编码的不同而不同）
@@ -177,11 +178,90 @@ end as 新工资
 from employees；
 ```
 结果：
+
 ![3](assets/3.png)
 
 ### case 函数使用二 ：类似于多重if
-java中：
-if（条件1）
+```
+case 
+when 条件1 then要显示的值1或语句1
+when 条件2 then要显示的值2或语句2
+...
+else 条件n then要显示的值n或语句n
+end
+```
+
+案例：查询员工的工资情况
+```
+如果工资>20000,显示A级别
+如果工资>15000,显示B级别
+如果工资>10000,显示C级别
+否则，显示D级别
+```
+```
+select salary,
+case
+when salary>20000 then 'A'
+when salary>15000 then 'B'
+when salary>10000 then 'C'
+else 'D'
+end as 工资级别 from employees；
+```
+结果：
+
+![4](assets/4.png)
+
+## 三、分组函数
+功能：用作统计使用，又称为聚合函数或统计函数或组函数
+
+分类：
+
+    sum 求和、avg平均值、max 最大值、min 最小值、count 计算个数
+
+特点：
+
+    1.sum、avg一般用于处理数值型
+    max、min、count用于各种类型
+    所有分组函数忽略null值
+
+### 1.简单的使用
+```
+select sum（salary） from employees;
+select avg(salary) from employees;
+select min（salary） from employees;
+select max(salary) from employees;
+select count（salary） from employees;
+```
+`select sum(salary) 和,round（avg(salary)，2） 平均，min（salary） 最低，max(salary) 最高，count（salary） 个数 from employees；`
+
+### 2.和distinct搭配
+
+`select sum（distinct salary），sum（salary） from employees；`
+
+
+`select count（distinct salary），sum（salary） from employees；`
+
+
+### 3.count函数的详细介绍
+
+`select count（salary） from employees；`
+
+`select count（*） from employees；`
+
+效率：
+
+    myisam储存引擎下，count（*）的效率高
+    innodb储存引擎下，count（*）和conut（1）的效率差不多，比count（字段）高一些
+
+ 查询员工表中的最大入职时间和最小入职时间的相差天数（diffrence）
+ 
+ `select datediff（max（hiredate），min（hiredate）） ；`
+
+ 3.查询部门编号为90的员工个数
+
+ `select count（*） from employees where department_id =90;`
+ 
+
 
 
 
