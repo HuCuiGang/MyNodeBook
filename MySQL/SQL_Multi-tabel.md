@@ -133,3 +133,33 @@ from employees e,employees m
 where e.manager_id=m.employee_id;
 ```
 
+## 进阶六
+###sql199
+    语法：
+    select 查询列表
+    from 表一 别名 （连接类型）
+    join 表二 别名 
+    on 连接条件条件
+    where 筛选条件
+    group by 分组
+    hiving 筛选条件
+    order by 排序列表（dec，desc） 
+
+    内连接：inner
+    外链接
+        左连接：left join 【outer】
+        右连接：right join
+        完全外连接：full 
+    交叉连接： cross
+
+
+### 非等值连接
+---
+select stalary,grade_level
+from employees e
+join job_grades g 
+on e.salary between g.lowest_sal and g.highest_sal
+
+
+
+
